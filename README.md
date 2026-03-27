@@ -8,7 +8,7 @@ Application Flutter permettant d'afficher des films populaires depuis l'API TMDB
 
 - Récupération des films depuis une API REST
 - Décodage JSON → objets Dart (`Movie`)
-- Affichage des films dans une listview
+- Affichage des films dans une ListView
 - Gestion des états :
   - Chargement
   - Erreur
