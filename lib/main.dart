@@ -6,7 +6,9 @@ import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
-  await dotenv.load(fileName: ".env"); //Flutter prend du temps à lire les fichiers, donc on utilise await pour s'assurer que les variables sont chargées avant de lancer l'app
+  await dotenv.load(
+    fileName: ".env",
+  ); //Flutter prend du temps à lire les fichiers, donc on utilise await pour s'assurer que les variables sont chargées avant de lancer l'app
   runApp(const MyApp());
 }
 
@@ -151,35 +153,51 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _fetchmovies() async {
+    // reset state before fetching
     setState(() {
       isloading = true;
       errormsg = null;
     });
-    final url = Uri.parse(
-      "https://api.themoviedb.org/3/movie/popular?api_key=$apiKey&language=en-US&page=1",
-    );
-    final response = await http.get(
-      url,
-      headers: {'User-Agent': 'Mozilla/5.0 ', 'Accept': 'application/json'},
-    );
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body) as Map<String, dynamic>;
-      final List results = data['results'] as List;
-      if (results.isEmpty) {
+
+    try {
+      final url = Uri.parse(
+        "https://api.themoviedb.org/3/movie/popular?api_key=$apiKey&language=en-US&page=1",
+      );
+
+      final response = await http.get(
+        url,
+        headers: {'User-Agent': 'Mozilla/5.0 ', 'Accept': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final List results = data['results'] as List;
+
+        if (results.isEmpty) {
+          // no movies found
+          setState(() {
+            isloading = false;
+            errormsg = "No movies found";
+          });
+          return;
+        }
+        // success
+        setState(() {
+          movies = results.map((json) => Movie.fromJson(json)).toList();
+          isloading = false;
+        });
+      } else {
+        // API error
         setState(() {
           isloading = false;
-          errormsg = "No movies found";
+          errormsg = "Failed to fetch movies";
         });
-        return;
       }
-      setState(() {
-        movies = results.map((json) => Movie.fromJson(json)).toList();
-        isloading = false;
-      });
-    } else {
+    } catch (e) {
+      // network error
       setState(() {
         isloading = false;
-        errormsg = "Failed to fetch movies";
+        errormsg = "Network error";
       });
     }
   }
@@ -191,8 +209,9 @@ class MovieCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final favoritesProvider = Provider.of<FavoriteProvider>(context);
-    final isFav = favoritesProvider.isFavorite(movie);
+    final isFav = context.watch<FavoriteProvider>().isFavorite(
+      movie,
+    ); //on ecoute pour l'icone de favoris
     return Container(
       width: 220,
       margin: EdgeInsets.symmetric(vertical: 30),
@@ -210,7 +229,9 @@ class MovieCard extends StatelessWidget {
               alignment: Alignment.topRight,
               child: IconButton(
                 onPressed: () {
-                  favoritesProvider.toggleFavorite(movie);
+                  context.read<FavoriteProvider>().toggleFavorite(
+                    movie,
+                  ); //on n'ecoute pas , on agit
                 },
                 icon: Icon(
                   isFav ? Icons.favorite : Icons.favorite_border,
@@ -290,7 +311,7 @@ class FavoriteMoviesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final favoritesProvider = Provider.of<FavoriteProvider>(context);
+    final favoritesProvider = context.watch<FavoriteProvider>();
     final favoriteMovies = favoritesProvider.favorites;
 
     return favoriteMovies.isEmpty
@@ -368,7 +389,7 @@ class FavoriteMoviesScreen extends StatelessWidget {
                     ),
                     IconButton(
                       onPressed: () {
-                        favoritesProvider.removeFavorite(movie);
+                        context.read<FavoriteProvider>().removeFavorite(movie);
                       },
                       icon: Icon(Icons.delete, color: Colors.black),
                     ),
