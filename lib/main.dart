@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:boudjema_dyhia_movie_explorer/models/movie.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
+Future<void> main() async {
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
@@ -41,7 +43,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   List<Movie> movies = [];
-  final String apiKey = "e364090cc27e44ebc0566490c38c5f70";
+  final String apiKey = dotenv.get('API_KEY');
   bool isloading = false;
   String? errormsg;
   int currentIndex = 0;
@@ -291,89 +293,89 @@ class FavoriteMoviesScreen extends StatelessWidget {
     final favoritesProvider = Provider.of<FavoriteProvider>(context);
     final favoriteMovies = favoritesProvider.favorites;
 
-    return  favoriteMovies.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "No favorite movies yet",
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                  SizedBox(height: 20),
-                  // ElevatedButton(
-                  //   onPressed: () {
-                  //     Navigator.pushReplacementNamed(context, "/");
-                  //   },
-                  //   child: Text("Go Back"),
-                  // ),
-                ],
-              ),
-            )
-          : ListView.separated(
-              itemCount: favoriteMovies.length,
-              separatorBuilder: (context, index) => SizedBox(height: 8),
-              itemBuilder: (context, index) {
-                final movie = favoriteMovies[index];
+    return favoriteMovies.isEmpty
+        ? Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "No favorite movies yet",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+                SizedBox(height: 20),
+                // ElevatedButton(
+                //   onPressed: () {
+                //     Navigator.pushReplacementNamed(context, "/");
+                //   },
+                //   child: Text("Go Back"),
+                // ),
+              ],
+            ),
+          )
+        : ListView.separated(
+            itemCount: favoriteMovies.length,
+            separatorBuilder: (context, index) => SizedBox(height: 8),
+            itemBuilder: (context, index) {
+              final movie = favoriteMovies[index];
 
-                return Container(
-                  margin: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Color.fromARGB(255, 196, 164, 164),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        height: 100,
-                        width: 80,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: NetworkImage(
-                              'https://image.tmdb.org/t/p/w500${movie.posterPath}',
-                            ),
-                            fit: BoxFit.cover,
+              return Container(
+                margin: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Color.fromARGB(255, 196, 164, 164),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      height: 100,
+                      width: 80,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: NetworkImage(
+                            'https://image.tmdb.org/t/p/w500${movie.posterPath}',
                           ),
+                          fit: BoxFit.cover,
                         ),
                       ),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              movie.originalTitle,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            movie.originalTitle,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
                             ),
-                            SizedBox(height: 6),
-                            Text(
-                              "Original Language: ${movie.originalLanguage}",
-                              style: TextStyle(color: Colors.red, fontSize: 12),
-                            ),
-                            SizedBox(height: 6),
-                            Text(
-                              movie.overview,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontSize: 12),
-                            ),
-                          ],
-                        ),
+                          ),
+                          SizedBox(height: 6),
+                          Text(
+                            "Original Language: ${movie.originalLanguage}",
+                            style: TextStyle(color: Colors.red, fontSize: 12),
+                          ),
+                          SizedBox(height: 6),
+                          Text(
+                            movie.overview,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ],
                       ),
-                      IconButton(
-                        onPressed: () {
-                          favoritesProvider.removeFavorite(movie);
-                        },
-                        icon: Icon(Icons.delete, color: Colors.black),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            );
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        favoritesProvider.removeFavorite(movie);
+                      },
+                      icon: Icon(Icons.delete, color: Colors.black),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
   }
 }
