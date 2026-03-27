@@ -285,6 +285,7 @@ class FavoriteProvider extends ChangeNotifier {
   List<Movie> favoritesList = [];
 
   List<Movie> get favorites => favoritesList; // best practice d'encapsulation 
+ 
   bool isFavorite(Movie movie) {
     return favoritesList.any((item) => item.id == movie.id);
   }
