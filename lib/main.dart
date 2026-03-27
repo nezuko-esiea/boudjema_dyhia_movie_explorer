@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<void> main() async {
-  await dotenv.load(fileName: ".env");
+  await dotenv.load(fileName: ".env"); //Flutter prend du temps à lire les fichiers, donc on utilise await pour s'assurer que les variables sont chargées avant de lancer l'app
   runApp(const MyApp());
 }
 
