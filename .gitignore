@@ -32,8 +32,12 @@ migrate_working_dir/
 .pub/
 /build/
 /coverage/
+
 # je ne veux pas le exclude pour ne pas poser de problèmes à mon prof lors de la correction, mais normalement il faut le mettre dans le .gitignore
 # .env 
+
+
+
 # Symbolication related
 app.*.symbols
 

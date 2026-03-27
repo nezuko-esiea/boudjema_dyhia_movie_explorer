@@ -15,7 +15,6 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -285,8 +284,7 @@ class MovieCard extends StatelessWidget {
 class FavoriteProvider extends ChangeNotifier {
   List<Movie> favoritesList = [];
 
-  List<Movie> get favorites => favoritesList;
-
+  List<Movie> get favorites => favoritesList; // best practice d'encapsulation 
   bool isFavorite(Movie movie) {
     return favoritesList.any((item) => item.id == movie.id);
   }
