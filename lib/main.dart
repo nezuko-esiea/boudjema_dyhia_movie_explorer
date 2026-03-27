@@ -281,6 +281,7 @@ class MovieCard extends StatelessWidget {
   }
 }
 
+
 class FavoriteProvider extends ChangeNotifier {
   List<Movie> favoritesList = [];
 
